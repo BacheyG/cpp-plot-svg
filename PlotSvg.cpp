@@ -9,8 +9,13 @@
 
 static constexpr float k_MarginPercentage = 0.05f;
 
+static Vector2D<float> convertVectorToSvgLocation(const Vector2D<float>& vector, const Vector2D<float>& offset, float scale, float height) {
+	return Vector2D<float>((vector.X + offset.X) * scale, (height - vector.Y + offset.Y) * scale);
+}
+
 static void outputNormalizedVectorCoordinates(std::ofstream& fstream, const Vector2D<float>& vector, const Vector2D<float>& offset, float scale, float height) {
-	fstream << (vector.X + offset.X) * scale << ", " << (height - vector.Y + offset.Y) * scale << " ";
+	Vector2D<float> convertedPosition = convertVectorToSvgLocation(vector, offset, scale, height);
+	fstream << convertedPosition.X << ", " << convertedPosition.Y << " ";
 }
 
 void getDimensionAndOffset(const std::vector<Vector2D<float>> vertices, Vector2D<float>& dimension, Vector2D<float>& offset) {
@@ -36,11 +41,16 @@ void PlotSvg::plotPoligonToSvg(const std::string& svgFilename, const std::vector
 	scale = std::min(width / dimension.X, height / dimension.Y) * (1.f - 2.f * k_MarginPercentage);
 	offset += dimension * k_MarginPercentage;
 	for (int i = 0; i < indices.size(); i += 3) {
-		svgFile << "<polygon points = \"";
+		svgFile << "<polygon points=\"";
 		outputNormalizedVectorCoordinates(svgFile, vertices[indices[i]], offset, scale, dimension.Y);
 		outputNormalizedVectorCoordinates(svgFile, vertices[indices[i + 1]], offset, scale, dimension.Y);
 		outputNormalizedVectorCoordinates(svgFile, vertices[indices[i + 2]], offset, scale, dimension.Y);
-		svgFile << "\" style = \"fill:lime;stroke:purple;stroke-width:2\"/>\n";
+		svgFile << "\" style=\"fill:lime;stroke:purple;stroke-width:2\"/>\n";
+	}
+	for (int i = 0; i < vertices.size(); ++i) {
+		Vector2D<float> vertexPosition = convertVectorToSvgLocation(vertices[i], offset, scale, dimension.Y);
+		constexpr static float k_vertexSize = 5;
+		svgFile << "<circle r=\"" << k_vertexSize << "\" cx=\"" << vertexPosition.X << "\" cy=\"" << vertexPosition.Y << "\" fill=\"red\"/>\n";
 	}
 	svgFile << "</svg>\n";
 	svgFile.close();
