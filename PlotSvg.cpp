@@ -23,25 +23,21 @@ PlotSvg::~PlotSvg() {
 }
 
 void PlotSvg::addLine(Vector2D<float> A, Vector2D<float> B, const std::string& color, float strokeWidth) {
-	_rectLowestPoint.X = std::min(A.X, _rectLowestPoint.X);
-	_rectLowestPoint.Y = std::min(A.Y, _rectLowestPoint.Y);
-	_rectHighestPoint.X = std::max(A.X, _rectHighestPoint.X);
-	_rectHighestPoint.Y = std::max(A.Y, _rectHighestPoint.Y);
-	_rectLowestPoint.X = std::min(B.X, _rectLowestPoint.X);
-	_rectLowestPoint.Y = std::min(B.Y, _rectLowestPoint.Y);
-	_rectHighestPoint.X = std::max(B.X, _rectHighestPoint.X);
-	_rectHighestPoint.Y = std::max(B.Y, _rectHighestPoint.Y);
+	updateRect(A);
+	updateRect(B);
 	_shapes.push_back(new SvgLine(A, B, color, strokeWidth));
 }
 
-void PlotSvg::addPolygon(const std::vector<Vector2D<float>> vertices, const std::vector<int> indices) {
+void PlotSvg::addCircle(Vector2D<float> center, float r, const std::string& color) {
+	updateRect(center);
+	_shapes.push_back(new SvgCircle(center, r, color));
+}
+
+void PlotSvg::addPolygon(const std::vector<Vector2D<float>> vertices, const std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth) {
 	for (int i = 0; i < vertices.size(); ++i) {
-		_rectLowestPoint.X = std::min(vertices[i].X, _rectLowestPoint.X);
-		_rectLowestPoint.Y = std::min(vertices[i].Y, _rectLowestPoint.Y);
-		_rectHighestPoint.X = std::max(vertices[i].X, _rectHighestPoint.X);
-		_rectHighestPoint.Y = std::max(vertices[i].Y, _rectHighestPoint.Y);
+		updateRect(vertices[i]);
 	}
-	_shapes.push_back(new SvgWiredPolygon(vertices, indices));
+	_shapes.push_back(new SvgPolygon(vertices, indices, fillColor, strokeColor, strokeWidth));
 }
 
 void PlotSvg::finalize() {
@@ -52,4 +48,11 @@ void PlotSvg::finalize() {
 	}
 	_svgFile << "</svg>\n";
 	_svgFile.close();
+}
+
+void PlotSvg::updateRect(const Vector2D<float>& coordinate) {
+	_rectLowestPoint.X = std::min(coordinate.X, _rectLowestPoint.X);
+	_rectLowestPoint.Y = std::min(coordinate.Y, _rectLowestPoint.Y);
+	_rectHighestPoint.X = std::max(coordinate.X, _rectHighestPoint.X);
+	_rectHighestPoint.Y = std::max(coordinate.Y, _rectHighestPoint.Y);
 }

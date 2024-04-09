@@ -16,7 +16,7 @@ public:
 
 class SvgLine : public SvgShape {
 public:
-	SvgLine(Vector2D<float> a, Vector2D<float> b, const std::string& color = "#000000", float strokeWidth = 5);
+	SvgLine(Vector2D<float> a, Vector2D<float> b, const std::string& color, float strokeWidth);
 	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
 private:
 	Vector2D<float> _A, _B;
@@ -24,11 +24,23 @@ private:
 	float _strokeWidth;
 };
 
-class SvgWiredPolygon : public SvgShape {
+class SvgCircle : public SvgShape {
 public:
-	SvgWiredPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices);
+	SvgCircle(Vector2D<float> center, float r, const std::string& color);
+	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
+private:
+	Vector2D<float> _center;
+	std::string _color;
+	float _radius;
+};
+
+class SvgPolygon : public SvgShape {
+public:
+	SvgPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth);
 	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
 private:
 	std::vector<Vector2D<float>> _vertices;
 	std::vector<int> _indices;
+	float _strokeWidth;
+	std::string _fillColor, _strokeColor;
 };

@@ -20,18 +20,22 @@ void SvgLine::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale
 	svgStream << "<line x1=\"" << A.X << "\" y1=\"" << A.Y << "\" x2=\"" << B.X << "\" y2=\"" << B.Y << "\" style=\"stroke:" << _color << "; stroke-width:" << _strokeWidth << "\"/>\n";
 }
 
-SvgWiredPolygon::SvgWiredPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices) {
-	_vertices = vertices;
-	_indices = indices;
+SvgCircle::SvgCircle(Vector2D<float> center, float r, const std::string& color) : _center(center), _radius(r), _color(color) {}
+
+void SvgCircle::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
+	Vector2D<float> center = convertVectorToSvgLocation(_center, offset, scale, canvasHeight);
+	svgStream << "<circle cx=\"" << center.X << "\" cy=\"" << center.Y << "\" r=\"" << _radius  << "\" fill=\"" << _color << "\"/>\n";
 }
 
-void SvgWiredPolygon::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
+SvgPolygon::SvgPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth) : _vertices(vertices), _indices(indices), _fillColor(fillColor), _strokeColor(strokeColor), _strokeWidth(strokeWidth) {}
+
+void SvgPolygon::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
 	for (int i = 0; i < _indices.size(); i += 3) {
 		svgStream << "<polygon points=\"";
 		outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i]], offset, scale, canvasHeight);
 		outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i + 1]], offset, scale, canvasHeight);
 		outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i + 2]], offset, scale, canvasHeight);
-		svgStream << "\" style=\"fill:lime;stroke:purple;stroke-width:2\"/>\n";
+		svgStream << "\" style=\"fill:" << _fillColor << ";stroke:" << _strokeColor << ";stroke-width:" << _strokeWidth << "\"/>\n";
 	}
 	for (int i = 0; i < _vertices.size(); ++i) {
 		Vector2D<float> vertexPosition = convertVectorToSvgLocation(_vertices[i], offset, scale, canvasHeight);
