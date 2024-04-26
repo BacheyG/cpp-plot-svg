@@ -17,7 +17,7 @@ public:
 	~PlotSvg();
 	void addLine(Vector2D<float> a, Vector2D<float> b, const std::string& color = "#000000", float strokeWidth = 5);
 	void addCircle(Vector2D<float> center, float r = 1, const std::string& color = "#000000");
-	void addPolygon(const std::vector<Vector2D<float>> vertices, const std::vector<int> indices, const std::string& fillColor = "#00000000", const std::string& strokeColor = "#000000", float strokeWidth = 1);
+	void addPolygon(const std::vector<Vector2D<float>> vertices, const std::vector<int> indices, const std::string& fillColor = "#00000000", const std::string& strokeColor = "#000000", float strokeWidth = 1, bool animated = false);
 	void finalize();
 private:
 	void updateRect(const Vector2D<float>& coordinate);

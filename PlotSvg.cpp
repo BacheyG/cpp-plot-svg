@@ -33,18 +33,19 @@ void PlotSvg::addCircle(Vector2D<float> center, float r, const std::string& colo
 	_shapes.push_back(new SvgCircle(center, r, color));
 }
 
-void PlotSvg::addPolygon(const std::vector<Vector2D<float>> vertices, const std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth) {
+void PlotSvg::addPolygon(const std::vector<Vector2D<float>> vertices, const std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated) {
 	for (int i = 0; i < vertices.size(); ++i) {
 		updateRect(vertices[i]);
 	}
-	_shapes.push_back(new SvgPolygon(vertices, indices, fillColor, strokeColor, strokeWidth));
+	_shapes.push_back(new SvgPolygon(vertices, indices, fillColor, strokeColor, strokeWidth, animated));
 }
 
 void PlotSvg::finalize() {
 	Vector2D<float> dimension = Vector2D<float>(_rectHighestPoint.X - _rectLowestPoint.X, _rectHighestPoint.Y - _rectLowestPoint.Y);
-	float scale = scale = std::min(_width / dimension.X, _height / dimension.Y) * (1.f - 2.f * k_MarginPercentage);
+	float scale = std::min(_width / dimension.X, _height / dimension.Y);
+	Vector2D<float> scaleOffset = Vector2D<float>((dimension.X - _width / scale) * 0.5f, (dimension.Y - _height / scale) * 0.5f);
 	for (const auto svgShape : _shapes) {
-		svgShape->plot(_svgFile, _rectLowestPoint + dimension * k_MarginPercentage, scale, dimension.Y);
+		svgShape->plot(_svgFile, _rectLowestPoint + dimension * k_MarginPercentage - scaleOffset, scale * (1.f - 2.f * k_MarginPercentage), dimension.Y);
 	}
 	_svgFile << "</svg>\n";
 	_svgFile.close();

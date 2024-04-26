@@ -36,11 +36,12 @@ private:
 
 class SvgPolygon : public SvgShape {
 public:
-	SvgPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth);
+	SvgPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated);
 	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
 private:
 	std::vector<Vector2D<float>> _vertices;
 	std::vector<int> _indices;
 	float _strokeWidth;
 	std::string _fillColor, _strokeColor;
+	bool _animated;
 };
