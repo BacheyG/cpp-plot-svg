@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "../Vector/Vector.hpp"
+#include "../Math/Vector.hpp"
 
 class SvgShape;
 

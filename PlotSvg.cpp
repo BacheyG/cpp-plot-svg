@@ -4,7 +4,7 @@
 #include "PlotSvg.hpp"
 #include "SvgShapes.hpp"
 
-#include "../Vector/Vector.hpp"
+#include "../Math/Vector.hpp"
 #include <limits>
 
 static constexpr float k_MarginPercentage = 0.05f;
