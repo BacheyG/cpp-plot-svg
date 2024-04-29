@@ -22,6 +22,7 @@ public:
 private:
 	void updateRect(const Vector2D<float>& coordinate);
 	std::ofstream _svgFile;
+	std::string _svgFileName;
 	Vector2D<float> _rectLowestPoint, _rectHighestPoint;
 	int _width, _height;
 	std::vector<SvgShape*> _shapes;

@@ -11,7 +11,10 @@ static constexpr float k_MarginPercentage = 0.05f;
 
 PlotSvg::PlotSvg(const std::string& filename, int width, int height) : _width(width), _height(height) {
 	_svgFile = std::ofstream(filename);
-	_svgFile << "<svg height=\"" << height << "\" width=\"" << width << "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+	size_t dotPos = filename.find_last_of('.');
+	_svgFileName = filename.substr(0, dotPos);
+
+	_svgFile << "<svg height=\"" << height << "\" width=\"" << width << "\" xmlns=\"http://www.w3.org/2000/svg\" preserveAspectRatio=\"xMinYMin meet\" viewBox=\"0 0 " << width << " " << height << "\">\n";
 	_rectLowestPoint = Vector2D<float>(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
 	_rectHighestPoint = Vector2D<float>(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
 }
@@ -37,7 +40,7 @@ void PlotSvg::addPolygon(const std::vector<Vector2D<float>> vertices, const std:
 	for (int i = 0; i < vertices.size(); ++i) {
 		updateRect(vertices[i]);
 	}
-	_shapes.push_back(new SvgPolygon(vertices, indices, fillColor, strokeColor, strokeWidth, animated));
+	_shapes.push_back(new SvgPolygon(vertices, indices, _svgFileName, fillColor, strokeColor, strokeWidth, animated));
 }
 
 void PlotSvg::finalize() {
@@ -45,7 +48,7 @@ void PlotSvg::finalize() {
 	float scale = std::min(_width / dimension.X, _height / dimension.Y);
 	Vector2D<float> scaleOffset = Vector2D<float>((dimension.X - _width / scale) * 0.5f, (dimension.Y - _height / scale) * 0.5f);
 	for (const auto svgShape : _shapes) {
-		svgShape->plot(_svgFile, _rectLowestPoint + dimension * k_MarginPercentage - scaleOffset, scale * (1.f - 2.f * k_MarginPercentage), dimension.Y);
+		svgShape->plot(_svgFile, Vector2D<float>(-_rectLowestPoint.X, _rectLowestPoint.Y) + dimension * k_MarginPercentage - scaleOffset, scale * (1.f - 2.f * k_MarginPercentage), dimension.Y);
 	}
 	_svgFile << "</svg>\n";
 	_svgFile.close();
