@@ -47,7 +47,6 @@ void SvgPolygon::plot(std::ofstream& svgStream, Vector2D<float> offset, float sc
 	float animationDuration = 0.35f;
 	int currentTriangleIndex = 1;
 	int triangleCount = static_cast<int>(_indices.size() / 3);
-	//float resetAt = animationStartOffset + animationDuration * triangleCount;
 	for (int i = 0; i < _indices.size(); i += 3) {
 		svgStream << "<polygon points=\"";
 		outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i]], offset, scale, canvasHeight);
@@ -68,4 +67,11 @@ void SvgPolygon::plot(std::ofstream& svgStream, Vector2D<float> offset, float sc
 		constexpr static float k_vertexSize = 5;
 		svgStream << "<circle r=\"" << k_vertexSize << "\" cx=\"" << vertexPosition.X << "\" cy=\"" << vertexPosition.Y << "\" fill=\"red\"/>\n";
 	}
+}
+
+SvgText::SvgText(Vector2D<float> position, const std::string& text, const std::string& color, int size) : _position(position), _text(text), _fillColor(color), _size(size) {}
+
+void SvgText::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
+	Vector2D<float> convertedVector = convertVectorToSvgLocation(_position, offset, scale, canvasHeight);
+	svgStream << "<text x=\"" << convertedVector.X << "\" y=\"" << convertedVector.Y << "\" style=\"fill:" << _fillColor << "; font:bold " << _size << "px sans-serif;\">" << _text << "</text>";
 }

@@ -46,3 +46,14 @@ private:
 	std::string _fillColor, _strokeColor;
 	bool _animated;
 };
+
+class SvgText : public SvgShape {
+public:
+	SvgText(Vector2D<float> position, const std::string& text, const std::string& color, int size);
+	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
+private:
+	Vector2D<float> _position;
+	std::string _text;
+	int _size;
+	std::string _fillColor;
+};

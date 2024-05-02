@@ -43,6 +43,10 @@ void PlotSvg::addPolygon(const std::vector<Vector2D<float>> vertices, const std:
 	_shapes.push_back(new SvgPolygon(vertices, indices, _svgFileName, fillColor, strokeColor, strokeWidth, animated));
 }
 
+void PlotSvg::addText(Vector2D<float> position, const std::string& text, const std::string& color, int size) {
+	_shapes.push_back(new SvgText(position, text, color, size));
+}
+
 void PlotSvg::finalize() {
 	Vector2D<float> dimension = Vector2D<float>(_rectHighestPoint.X - _rectLowestPoint.X, _rectHighestPoint.Y - _rectLowestPoint.Y);
 	float scale = std::min(_width / dimension.X, _height / dimension.Y);
