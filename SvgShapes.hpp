@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "../Math/Vector.hpp"
+#include "type_defines.h"
+
 #include <fstream>
 #include <string>
 #include <vector>
@@ -11,36 +12,36 @@
 class SvgShape {
 public:
 	virtual ~SvgShape() = default;
-	virtual void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) = 0;
+	virtual void plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) = 0;
 };
 
 class SvgLine : public SvgShape {
 public:
-	SvgLine(Vector2D<float> a, Vector2D<float> b, const std::string& color, float strokeWidth);
-	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
+	SvgLine(VECTOR2D a, VECTOR2D b, const std::string& color, float strokeWidth);
+	void plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) override;
 private:
-	Vector2D<float> _A, _B;
+	VECTOR2D _A, _B;
 	std::string _color;
 	float _strokeWidth;
 };
 
 class SvgCircle : public SvgShape {
 public:
-	SvgCircle(Vector2D<float> center, float r, const std::string& color);
-	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
+	SvgCircle(VECTOR2D center, float r, const std::string& color);
+	void plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) override;
 private:
-	Vector2D<float> _center;
+	VECTOR2D _center;
 	std::string _color;
 	float _radius;
 };
 
 class SvgPolygon : public SvgShape {
 public:
-	SvgPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated);
-	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
+	SvgPolygon(std::vector<VECTOR2D> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated);
+	void plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) override;
 private:
 	std::string _name;
-	std::vector<Vector2D<float>> _vertices;
+	std::vector<VECTOR2D> _vertices;
 	std::vector<int> _indices;
 	float _strokeWidth;
 	std::string _fillColor, _strokeColor;
@@ -49,10 +50,10 @@ private:
 
 class SvgText : public SvgShape {
 public:
-	SvgText(Vector2D<float> position, const std::string& text, const std::string& color, int size);
-	void plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) override;
+	SvgText(VECTOR2D position, const std::string& text, const std::string& color, int size);
+	void plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) override;
 private:
-	Vector2D<float> _position;
+	VECTOR2D _position;
 	std::string _text;
 	int _size;
 	std::string _fillColor;

@@ -3,31 +3,31 @@
 
 #include "SvgShapes.hpp"
 
-static Vector2D<float> convertVectorToSvgLocation(const Vector2D<float>& vector, const Vector2D<float>& offset, float scale, float originalHeight) {
-	return Vector2D<float>((vector.X + offset.X) * scale, (originalHeight - vector.Y + offset.Y) * scale);
+static VECTOR2D convertVectorToSvgLocation(const VECTOR2D& vector, const VECTOR2D& offset, float scale, float originalHeight) {
+	return VECTOR2D((vector.X + offset.X) * scale, (originalHeight - vector.Y + offset.Y) * scale);
 }
 
-static void outputNormalizedVectorCoordinates(std::ofstream& fstream, const Vector2D<float>& vector, const Vector2D<float>& offset, float scale, float originalHeight) {
-	Vector2D<float> convertedPosition = convertVectorToSvgLocation(vector, offset, scale, originalHeight);
+static void outputNormalizedVectorCoordinates(std::ofstream& fstream, const VECTOR2D& vector, const VECTOR2D& offset, float scale, float originalHeight) {
+	VECTOR2D convertedPosition = convertVectorToSvgLocation(vector, offset, scale, originalHeight);
 	fstream << convertedPosition.X << ", " << convertedPosition.Y << " ";
 }
 
-SvgLine::SvgLine(Vector2D<float> a, Vector2D<float> b, const std::string& color, float strokeWidth) : _A(a), _B(b), _color(color), _strokeWidth(strokeWidth) {}
+SvgLine::SvgLine(VECTOR2D a, VECTOR2D b, const std::string& color, float strokeWidth) : _A(a), _B(b), _color(color), _strokeWidth(strokeWidth) {}
 
-void SvgLine::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
-	Vector2D<float> A = convertVectorToSvgLocation(_A, offset, scale, canvasHeight);
-	Vector2D<float> B = convertVectorToSvgLocation(_B, offset, scale, canvasHeight);
+void SvgLine::plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) {
+	VECTOR2D A = convertVectorToSvgLocation(_A, offset, scale, canvasHeight);
+	VECTOR2D B = convertVectorToSvgLocation(_B, offset, scale, canvasHeight);
 	svgStream << "<line x1=\"" << A.X << "\" y1=\"" << A.Y << "\" x2=\"" << B.X << "\" y2=\"" << B.Y << "\" style=\"stroke:" << _color << "; stroke-width:" << _strokeWidth << "\"/>\n";
 }
 
-SvgCircle::SvgCircle(Vector2D<float> center, float r, const std::string& color) : _center(center), _radius(r), _color(color) {}
+SvgCircle::SvgCircle(VECTOR2D center, float r, const std::string& color) : _center(center), _radius(r), _color(color) {}
 
-void SvgCircle::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
-	Vector2D<float> center = convertVectorToSvgLocation(_center, offset, scale, canvasHeight);
+void SvgCircle::plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) {
+	VECTOR2D center = convertVectorToSvgLocation(_center, offset, scale, canvasHeight);
 	svgStream << "<circle cx=\"" << center.X << "\" cy=\"" << center.Y << "\" r=\"" << _radius  << "\" fill=\"" << _color << "\"/>\n";
 }
 
-SvgPolygon::SvgPolygon(std::vector<Vector2D<float>> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated) : _vertices(vertices), _indices(indices), _name(name), _fillColor(fillColor), _strokeColor(strokeColor), _strokeWidth(strokeWidth), _animated(animated) {}
+SvgPolygon::SvgPolygon(std::vector<VECTOR2D> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated) : _vertices(vertices), _indices(indices), _name(name), _fillColor(fillColor), _strokeColor(strokeColor), _strokeWidth(strokeWidth), _animated(animated) {}
 
 static void addPropertyRepeatingAnimation(std::ofstream& svgStream, const std::string& name, const std::string& attributeName, const std::string& from, const std::string& to, int currentIndex, int endIndex, float startOffset, float animationDuration) {
 	svgStream << "<animate id=\"anim_" << name << currentIndex << "\" attributeName = \"" << attributeName << "\" from=\"" << from << "\" to=\"" << to << "\" dur=\"" << animationDuration << "s\" ";
@@ -42,7 +42,7 @@ static void addPropertyRepeatingAnimation(std::ofstream& svgStream, const std::s
 	svgStream << "<set attributeName = \"" << attributeName << "\" to=\"" << from << "\" begin= \"anim_" << name << endIndex << ".end + 1s\" />";
 }
 
-void SvgPolygon::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
+void SvgPolygon::plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) {
 	float animationStartOffset = 2;
 	float animationDuration = 0.35f;
 	int currentTriangleIndex = 1;
@@ -63,15 +63,15 @@ void SvgPolygon::plot(std::ofstream& svgStream, Vector2D<float> offset, float sc
 		svgStream << "</polygon>\n";
 	}
 	for (int i = 0; i < _vertices.size(); ++i) {
-		Vector2D<float> vertexPosition = convertVectorToSvgLocation(_vertices[i], offset, scale, canvasHeight);
+		VECTOR2D vertexPosition = convertVectorToSvgLocation(_vertices[i], offset, scale, canvasHeight);
 		constexpr static float k_vertexSize = 5;
 		svgStream << "<circle r=\"" << k_vertexSize << "\" cx=\"" << vertexPosition.X << "\" cy=\"" << vertexPosition.Y << "\" fill=\"red\"/>\n";
 	}
 }
 
-SvgText::SvgText(Vector2D<float> position, const std::string& text, const std::string& color, int size) : _position(position), _text(text), _fillColor(color), _size(size) {}
+SvgText::SvgText(VECTOR2D position, const std::string& text, const std::string& color, int size) : _position(position), _text(text), _fillColor(color), _size(size) {}
 
-void SvgText::plot(std::ofstream& svgStream, Vector2D<float> offset, float scale, float canvasHeight) {
-	Vector2D<float> convertedVector = convertVectorToSvgLocation(_position, offset, scale, canvasHeight);
+void SvgText::plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) {
+	VECTOR2D convertedVector = convertVectorToSvgLocation(_position, offset, scale, canvasHeight);
 	svgStream << "<text x=\"" << convertedVector.X << "\" y=\"" << convertedVector.Y << "\" style=\"fill:" << _fillColor << "; font:bold " << _size << "px sans-serif;\">" << _text << "</text>";
 }
