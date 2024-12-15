@@ -24,10 +24,10 @@ SvgCircle::SvgCircle(VECTOR2D center, float r, const std::string& color) : _cent
 
 void SvgCircle::plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) {
 	VECTOR2D center = convertVectorToSvgLocation(_center, offset, scale, canvasHeight);
-	svgStream << "<circle cx=\"" << center.X << "\" cy=\"" << center.Y << "\" r=\"" << _radius  << "\" fill=\"" << _color << "\"/>\n";
+	svgStream << "<circle cx=\"" << center.X << "\" cy=\"" << center.Y << "\" r=\"" << _radius << "\" fill=\"" << _color << "\"/>\n";
 }
 
-SvgPolygon::SvgPolygon(std::vector<VECTOR2D> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated) : _vertices(vertices), _indices(indices), _name(name), _fillColor(fillColor), _strokeColor(strokeColor), _strokeWidth(strokeWidth), _animated(animated) {}
+SvgPolygon::SvgPolygon(std::vector<VECTOR2D> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool triangulatedIndices, bool animated) : _vertices(vertices), _indices(indices), _name(name), _fillColor(fillColor), _strokeColor(strokeColor), _strokeWidth(strokeWidth), _triangulated(triangulatedIndices), _animated(animated) {}
 
 static void addPropertyRepeatingAnimation(std::ofstream& svgStream, const std::string& name, const std::string& attributeName, const std::string& from, const std::string& to, int currentIndex, int endIndex, float startOffset, float animationDuration) {
 	svgStream << "<animate id=\"anim_" << name << currentIndex << "\" attributeName = \"" << attributeName << "\" from=\"" << from << "\" to=\"" << to << "\" dur=\"" << animationDuration << "s\" ";
@@ -47,22 +47,37 @@ void SvgPolygon::plot(std::ofstream& svgStream, VECTOR2D offset, float scale, fl
 	float animationDuration = 0.35f;
 	int currentTriangleIndex = 1;
 	int triangleCount = static_cast<int>(_indices.size() / 3);
-	for (int i = 0; i < _indices.size(); i += 3) {
-		svgStream << "<polygon points=\"";
-		outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i]], offset, scale, canvasHeight);
-		outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i + 1]], offset, scale, canvasHeight);
-		outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i + 2]], offset, scale, canvasHeight);
-		const std::string& startColor = _animated ? "#ffffff00" : _fillColor;
-		float startStrokeWidth = _animated ? 0 : _strokeWidth;
-		svgStream << "\" style=\"fill:" << startColor << ";stroke:" << _strokeColor << ";stroke-width:" << startStrokeWidth << "\">";
-		if (_animated) {
-			addPropertyRepeatingAnimation(svgStream, _name, "fill", "#ffffff00", _fillColor, currentTriangleIndex, triangleCount, animationStartOffset, animationDuration);
-			addPropertyRepeatingAnimation(svgStream, _name, "stroke-width", "0", std::to_string(_strokeWidth), currentTriangleIndex, triangleCount, animationStartOffset, animationDuration);
-			currentTriangleIndex += 1;
+	if (_triangulated) 
+	{
+		for (int i = 0; i < _indices.size(); i += 3) {
+			svgStream << "<polygon points=\"";
+			outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i]], offset, scale, canvasHeight);
+			outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i + 1]], offset, scale, canvasHeight);
+			outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i + 2]], offset, scale, canvasHeight);
+			const std::string& startColor = _animated ? "#ffffff00" : _fillColor;
+			float startStrokeWidth = _animated ? 0 : _strokeWidth;
+			svgStream << "\" style=\"fill:" << startColor << ";stroke:" << _strokeColor << ";stroke-width:" << startStrokeWidth << "\">";
+			if (_animated) {
+				addPropertyRepeatingAnimation(svgStream, _name, "fill", "#ffffff00", _fillColor, currentTriangleIndex, triangleCount, animationStartOffset, animationDuration);
+				addPropertyRepeatingAnimation(svgStream, _name, "stroke-width", "0", std::to_string(_strokeWidth), currentTriangleIndex, triangleCount, animationStartOffset, animationDuration);
+				currentTriangleIndex += 1;
+			}
+			svgStream << "</polygon>\n";
 		}
+	} 
+	else 
+	{
+		svgStream << "<polygon points=\"";
+		for (int i = 0; i < _indices.size(); ++i) {
+			outputNormalizedVectorCoordinates(svgStream, _vertices[_indices[i]], offset, scale, canvasHeight);
+		}
+		const std::string& startColor =  _fillColor;
+		float startStrokeWidth = _strokeWidth;
+		svgStream << "\" style=\"fill:" << startColor << ";stroke:" << _strokeColor << ";stroke-width:" << startStrokeWidth << "\">";
 		svgStream << "</polygon>\n";
 	}
-	for (int i = 0; i < _vertices.size(); ++i) {
+	for (int i = 0; i < _vertices.size(); ++i) 
+	{
 		VECTOR2D vertexPosition = convertVectorToSvgLocation(_vertices[i], offset, scale, canvasHeight);
 		constexpr static float k_vertexSize = 5;
 		svgStream << "<circle r=\"" << k_vertexSize << "\" cx=\"" << vertexPosition.X << "\" cy=\"" << vertexPosition.Y << "\" fill=\"red\"/>\n";

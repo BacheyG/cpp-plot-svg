@@ -37,7 +37,7 @@ private:
 
 class SvgPolygon : public SvgShape {
 public:
-	SvgPolygon(std::vector<VECTOR2D> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated);
+	SvgPolygon(std::vector<VECTOR2D> vertices, std::vector<int> indices, const std::string& name, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool triangulatedIndices, bool animated);
 	void plot(std::ofstream& svgStream, VECTOR2D offset, float scale, float canvasHeight) override;
 private:
 	std::string _name;
@@ -46,6 +46,7 @@ private:
 	float _strokeWidth;
 	std::string _fillColor, _strokeColor;
 	bool _animated;
+	bool _triangulated;
 };
 
 class SvgText : public SvgShape {

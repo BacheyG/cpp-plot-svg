@@ -36,11 +36,11 @@ void PlotSvg::addCircle(VECTOR2D center, float r, const std::string& color) {
 	_shapes.push_back(new SvgCircle(center, r, color));
 }
 
-void PlotSvg::addPolygon(const std::vector<VECTOR2D> vertices, const std::vector<int> indices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated) {
+void PlotSvg::addPolygon(const std::vector<VECTOR2D> vertices, const std::vector<int> indices, bool triangulatedIndices, const std::string& fillColor, const std::string& strokeColor, float strokeWidth, bool animated) {
 	for (int i = 0; i < vertices.size(); ++i) {
 		updateRect(vertices[i]);
 	}
-	_shapes.push_back(new SvgPolygon(vertices, indices, _svgFileName, fillColor, strokeColor, strokeWidth, animated));
+	_shapes.push_back(new SvgPolygon(vertices, indices, _svgFileName, fillColor, strokeColor, strokeWidth, triangulatedIndices, animated));
 }
 
 void PlotSvg::addText(VECTOR2D position, const std::string& text, const std::string& color, int size) {
