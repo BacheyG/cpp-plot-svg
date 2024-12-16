@@ -79,7 +79,7 @@ void SvgPolygon::plot(std::ofstream& svgStream, VECTOR2D offset, float scale, fl
 	for (int i = 0; i < _vertices.size(); ++i) 
 	{
 		VECTOR2D vertexPosition = convertVectorToSvgLocation(_vertices[i], offset, scale, canvasHeight);
-		constexpr static float k_vertexSize = 5;
+		constexpr static float k_vertexSize = 2;
 		svgStream << "<circle r=\"" << k_vertexSize << "\" cx=\"" << vertexPosition.X << "\" cy=\"" << vertexPosition.Y << "\" fill=\"red\"/>\n";
 	}
 }
